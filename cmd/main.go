@@ -33,6 +33,7 @@ func main() {
 	})
 
 	e.Echo.POST("/graphql", echo.WrapHandler(anihup_graphql))
+	e.Echo.GET("/graphql", echo.WrapHandler(anihup_graphql))
 
 	fmt.Println(e.Start("127.0.0.1:" + environment.HostPort))
 }

@@ -17,11 +17,11 @@ func NewUseCaseImpl(repository mysql_repository.Repository) UseCase {
 }
 
 type UseCase interface {
-	GetManga(page uint, pageSize uint) ([]dto.DBGetManga, *uint, error)
+	GetManga(page int, pageSize int) ([]dto.DBGetManga, *int, error)
 	AddManga(manga models.Manga) (*models.Manga, error)
 }
 
-func (u usecase) GetManga(page uint, pageSize uint) ([]dto.DBGetManga, *uint, error) {
+func (u usecase) GetManga(page int, pageSize int) ([]dto.DBGetManga, *int, error) {
 	count, data, err := u.Repository.GetManga(page, pageSize)
 	if err != nil {
 		return nil, nil, err

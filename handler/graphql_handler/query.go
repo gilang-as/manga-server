@@ -1,7 +1,7 @@
 package graphql_handler
 
 import (
-	"manga-server/repository/mysql_repository/schema"
+	"manga-server/handler/graphql_handler/schema"
 	"manga-server/usecase"
 
 	"github.com/graphql-go/graphql"

@@ -5,6 +5,7 @@ import (
 	"manga-server/domain/dto"
 	"manga-server/domain/models"
 	"manga-server/pkg/mysql"
+	"math"
 )
 
 type MysqlRepository struct {
@@ -18,18 +19,20 @@ func NewMysqlRepository(db *gorm.DB) Repository {
 }
 
 type Repository interface {
-	GetManga(page uint, pageSize uint) (*uint,[]dto.DBGetManga, error)
+	GetManga(page int, pageSize int) (*int,[]dto.DBGetManga, error)
 	AddManga(data models.Manga) (*models.Manga, error)
 }
 
-func (m MysqlRepository) GetManga(page uint, pageSize uint) (*uint,[]dto.DBGetManga, error) {
+func (m MysqlRepository) GetManga(page int, pageSize int) (*int,[]dto.DBGetManga, error) {
 	var data []dto.DBGetManga
-	var count uint
+	var count int
 	err := m.db.Model(&models.Manga{}).Count(&count).Error
-	err = m.db.Scopes(mysql.Paginate(page, pageSize)).Find(&data).Error
+	err = m.db.Scopes(mysql.Paginate(uint(page), uint(pageSize))).Order("created_at DESC").Find(&data).Error
 	if err != nil {
 		return nil, nil, err
 	}
+	counts := math.Ceil(float64(count)/float64(pageSize))
+	count = int(counts)
 	return &count, data, nil
 }
 

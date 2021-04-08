@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/graphql-go/graphql"
 	"manga-server/domain/models"
+	graphql2 "manga-server/pkg/graphql"
 	"manga-server/usecase"
 	"time"
 )
@@ -33,31 +34,20 @@ var mangaType = graphql.NewObject(
 
 // Manga Query
 func GetManga(usecase usecase.UseCase) *graphql.Field {
-	return &graphql.Field{
-		Type: graphql.NewList(mangaType),
-		Args: graphql.FieldConfigArgument{
-			"page": &graphql.ArgumentConfig{
-				Type: graphql.Int,
-			},
-			"size": &graphql.ArgumentConfig{
-				Type: graphql.Int,
-			},
-		},
-		Resolve: func(p graphql.ResolveParams) (i interface{}, e error) {
-			page, ok := p.Args["page"].(int)
-			size, ok := p.Args["size"].(int)
-			if ok {
-				data, _, err := usecase.GetManga(uint(page), uint(size))
-				if err != nil {
-					return nil, err
-				}
-				return data, nil
+	return graphql2.Paginated(&graphql2.PaginatedField{
+		Name: "Languages",
+		Type: mangaType,
+		Args: nil,
+		DataAndCountResolve: func(p graphql.ResolveParams, page graphql2.Page) (interface{}, *int, error) {
+			data, total, err := usecase.GetManga(page.Skip, page.Limit)
+			if err != nil {
+				return nil, nil, err
 			}
-			return nil, errors.New("Error")
+			return data, total, nil
 		},
-		Description: "mangaType",
-	}
+	})
 }
+
 
 func AddManga(usecase usecase.UseCase) *graphql.Field {
 	return &graphql.Field{
