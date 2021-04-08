@@ -14,7 +14,7 @@ var mangaType = graphql.NewObject(
 		Name: "Manga",
 		Description: "Manga data",
 		Fields: graphql.Fields{
-			//"dt":      &graphql.Field{Type: graphql.ID},
+			"id":      &graphql.Field{Type: graphql.ID},
 			"title":      &graphql.Field{Type: graphql.String},
 			"original_title":       &graphql.Field{Type: graphql.String},
 			"english_title": &graphql.Field{Type: graphql.String},
@@ -26,6 +26,7 @@ var mangaType = graphql.NewObject(
 			"published_to": &graphql.Field{Type: graphql.DateTime},
 			"synopsis": &graphql.Field{Type: graphql.String},
 			"image_url": &graphql.Field{Type: graphql.String},
+			"created_at": &graphql.Field{Type: graphql.DateTime},
 		},
 	},
 )
@@ -101,9 +102,13 @@ func AddManga(usecase usecase.UseCase) *graphql.Field {
 					Synopsis:      synopsis,
 					ImageUrl:      imageUrl,
 				}
-				return value, nil
+				data, err := usecase.AddManga(value)
+				if err != nil {
+					return nil, err
+				}
+				return data, nil
 			}
-			return nil, errors.New("Error Bro")
+			return nil, errors.New("Error")
 		},
 		Description: "mangaType",
 	}
